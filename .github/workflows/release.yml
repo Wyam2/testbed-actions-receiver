@@ -1,0 +1,22 @@
+name: Test release dispatch action
+
+on:
+  repository_dispatch:
+    types: ['release']
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Display release tag
+        run: echo ${{ github.event.client_payload.tag }}
+        shell: bash
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.client_payload.tag }}
+      - name: Create packages
+        run: ./build.ps1 -Target Package -ScriptArgs ('--tag=${{ github.event.client_payload.tag }}')
+        shell: pwsh
+
